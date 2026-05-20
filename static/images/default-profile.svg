@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="Default profile image">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#eef2ff" />
+      <stop offset="100%" stop-color="#dfe8ff" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6c7cff" />
+      <stop offset="100%" stop-color="#5b46f6" />
+    </linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="80" fill="url(#bg)" />
+  <circle cx="80" cy="60" r="28" fill="url(#accent)" opacity="0.95" />
+  <path d="M36 132c8-22 24-34 44-34s36 12 44 34" fill="url(#accent)" opacity="0.95" />
+</svg>

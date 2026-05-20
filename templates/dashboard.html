@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Market Insights | CareerLink{% endblock %}
+
+{% block content %}
+<section class="hero-section hero-section--subpage">
+    <div class="container">
+        <div class="hero-surface hero-surface--insights">
+            <div class="row g-4 align-items-center">
+                <div class="col-xl-6">
+                    <span class="eyebrow-badge eyebrow-badge--soft">Market Insights</span>
+                    <h1 class="hero-title hero-title--sub mt-4">Market Insights</h1>
+                    <p class="hero-copy mt-3">
+                        Explore job market trends, top companies, in-demand skills, and hiring locations using the jobs already stored in CareerLink.
+                    </p>
+                </div>
+                <div class="col-xl-6">
+                    <div class="hero-subvisual hero-subvisual--wide">
+                        <img src="{{ url_for('static', filename='images/dashboard-illustration.svg') }}" alt="Market insights illustration" class="page-visual">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad section-pad--tight">
+    <div class="container">
+        <div class="stats-grid stats-grid--insights mb-4">
+            <div class="stats-card stats-card--soft">
+                <span class="stats-card__icon stats-card__icon--violet"><i class="bi bi-briefcase"></i></span>
+                <div>
+                    <span>Total Jobs</span>
+                    <h3>{{ dashboard_data.total_jobs }}</h3>
+                </div>
+            </div>
+            <div class="stats-card stats-card--soft">
+                <span class="stats-card__icon stats-card__icon--mint"><i class="bi bi-buildings"></i></span>
+                <div>
+                    <span>Top Companies</span>
+                    <h3>{{ dashboard_data.total_companies }}</h3>
+                </div>
+            </div>
+            <div class="stats-card stats-card--soft">
+                <span class="stats-card__icon stats-card__icon--amber"><i class="bi bi-stars"></i></span>
+                <div>
+                    <span>High Demand Skills</span>
+                    <h3>{{ dashboard_data.skills_labels|length }}</h3>
+                </div>
+            </div>
+            <div class="stats-card stats-card--soft">
+                <span class="stats-card__icon stats-card__icon--sky"><i class="bi bi-geo-alt"></i></span>
+                <div>
+                    <span>Top Locations</span>
+                    <h3>{{ dashboard_data.total_locations }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="insights-grid">
+            <div class="chart-card chart-card--span-two">
+                <div class="card-heading">
+                    <div>
+                        <h3>Most Demanded Skills</h3>
+                        <p class="mb-0">Live demand count from current job postings.</p>
+                    </div>
+                </div>
+                <div class="chart-stage chart-stage--lg">
+                    <canvas id="skillsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="card-heading">
+                    <div>
+                        <h3>Location Distribution</h3>
+                        <p class="mb-0">Top hiring cities in your dataset.</p>
+                    </div>
+                </div>
+                <div class="chart-stage">
+                    <canvas id="locationsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="card-heading">
+                    <div>
+                        <h3>Top Companies</h3>
+                        <p class="mb-0">Organizations with the most openings.</p>
+                    </div>
+                </div>
+                <div class="chart-stage">
+                    <canvas id="companiesChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="card-heading d-flex justify-content-between align-items-center gap-3">
+                    <div>
+                        <h3>Top Skills In Demand</h3>
+                        <p class="mb-0">Most frequent skills across listed roles.</p>
+                    </div>
+                </div>
+                <div class="demand-skill-list demand-skill-list--detailed">
+                    {% for label in dashboard_data.skills_labels %}
+                    <div class="demand-skill">
+                        <span>{{ label }}</span>
+                        <strong>{{ dashboard_data.skills_values[loop.index0] }}</strong>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="card-heading">
+                    <div>
+                        <h3>Top Locations</h3>
+                        <p class="mb-0">Cities with the strongest hiring activity.</p>
+                    </div>
+                </div>
+                <div class="rank-list">
+                    {% for location in dashboard_data.location_labels %}
+                    <div class="rank-list__item">
+                        <div>
+                            <strong>{{ location }}</strong>
+                        </div>
+                        <span>{{ dashboard_data.location_values[loop.index0] }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="insight-summary-card">
+                <div class="insight-summary-card__icon"><i class="bi bi-graph-up-arrow"></i></div>
+                <h3>Market Summary</h3>
+                <p>
+                    CareerLink is currently tracking {{ dashboard_data.total_jobs }} job postings across
+                    {{ dashboard_data.total_companies }} companies and {{ dashboard_data.total_locations }} locations.
+                </p>
+                <p class="mb-0">
+                    The strongest demand right now is concentrated around
+                    {% if dashboard_data.skills_labels %}
+                    <strong>{{ dashboard_data.skills_labels[0] }}</strong>{% if dashboard_data.skills_labels|length > 1 %}, <strong>{{ dashboard_data.skills_labels[1] }}</strong>{% endif %}{% if dashboard_data.skills_labels|length > 2 %}, and <strong>{{ dashboard_data.skills_labels[2] }}</strong>{% endif %}.
+                    {% else %}
+                    the skills currently represented in your jobs table.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.dashboardData = {{ dashboard_data | tojson }};
+</script>
+{% endblock %}

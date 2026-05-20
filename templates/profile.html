@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Profile | CareerLink{% endblock %}
+
+{% block content %}
+<section class="section-pad">
+    <div class="container">
+        <div class="section-header mb-4">
+            <span class="eyebrow-badge">Account Settings</span>
+            <h1 class="mt-3">Profile</h1>
+            <p class="text-muted mb-0">Keep your personal details and career interests updated for a smoother CareerLink experience.</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-xl-9">
+                <div class="glass-panel p-4 p-lg-5">
+                    <form method="POST" enctype="multipart/form-data" class="row g-4">
+                        <div class="col-12">
+                            <div class="profile-picture-panel">
+                                <span class="profile-picture-panel__avatar">
+                                    {% if profile_image_url %}
+                                    <img
+                                        src="{{ profile_image_url }}"
+                                        alt="{{ profile_user.name }} profile picture preview"
+                                        class="profile-picture-panel__image"
+                                    >
+                                    {% else %}
+                                    {{ current_user_initials }}
+                                    {% endif %}
+                                </span>
+                                <div class="profile-picture-panel__content">
+                                    <h2>Profile Picture</h2>
+                                    <p class="mb-0">Upload a JPG or PNG image to personalize your CareerLink account. If no image is uploaded, your initials will be shown as the avatar.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ profile_user.name }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ profile_user.email }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="text" class="form-control" id="phone" name="phone" value="{{ profile_data.phone or '' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" value="{{ profile_data.location or '' }}">
+                        </div>
+                        <div class="col-12">
+                            <label for="career_interests" class="form-label">Skills / Career Interests</label>
+                            <textarea class="form-control" id="career_interests" name="career_interests" rows="5" placeholder="Product design, Python, data analysis, growth marketing">{{ profile_data.career_interests or '' }}</textarea>
+                        </div>
+                        <div class="col-12">
+                            <label for="linkedin" class="form-label">LinkedIn Profile</label>
+                            <input type="url" class="form-control" id="linkedin" name="linkedin" value="{{ profile_data.linkedin or '' }}" placeholder="https://www.linkedin.com/in/your-profile/">
+                        </div>
+                        <div class="col-12">
+                            <label for="profile_image" class="form-label">Upload Profile Image</label>
+                            <input class="form-control" type="file" id="profile_image" name="profile_image" accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+                            <div class="form-text">Allowed file types: JPG, JPEG, PNG.</div>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

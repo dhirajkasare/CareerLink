@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Resume Analyzer | CareerLink{% endblock %}
+
+{% block content %}
+<section class="hero-section hero-section--subpage">
+    <div class="container">
+        <div class="hero-surface hero-surface--resume">
+            <div class="row g-4 align-items-center">
+                <div class="col-xl-7">
+                    <span class="eyebrow-badge eyebrow-badge--soft">Resume support</span>
+                    <h1 class="hero-title hero-title--sub mt-4">Resume Analyzer</h1>
+                    <p class="hero-copy mt-3">
+                        Upload your PDF resume and get AI feedback on structure, strengths, missing sections, and practical next steps.
+                    </p>
+
+                    <div class="feature-pill-row mt-4">
+                        <span class="feature-pill"><i class="bi bi-stars"></i> AI Powered</span>
+                        <span class="feature-pill"><i class="bi bi-lightning-charge"></i> Instant Feedback</span>
+                        <span class="feature-pill"><i class="bi bi-file-earmark-check"></i> PDF Only</span>
+                        <span class="feature-pill"><i class="bi bi-shield-lock"></i> Secure Upload</span>
+                    </div>
+                </div>
+
+                <div class="col-xl-5">
+                    <div class="resume-upload-panel">
+                        <div class="resume-upload-panel__icon">
+                            <i class="bi bi-cloud-arrow-up"></i>
+                        </div>
+                        <h3>Upload Your Resume</h3>
+                        <p>Upload PDF format only.</p>
+
+                        <form id="resumeAnalysisForm" class="resume-form">
+                            <div class="mb-3">
+                                <label for="resume" class="form-label visually-hidden">Choose your resume file</label>
+                                <input class="form-control" type="file" id="resume" name="resume" accept=".pdf" required>
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-3 align-items-center">
+                                <button type="submit" class="btn btn-gradient w-100" id="resumeAnalyzeButton">Upload and Analyze</button>
+                                <div class="fraud-loading" id="resumeLoading" hidden>
+                                    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                    <span>Extracting resume text and generating feedback...</span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad section-pad--tight">
+    <div class="container">
+        <div id="resumeAlert" class="alert alert-danger" hidden></div>
+
+        <div class="resume-empty-state empty-state" id="resumeEmptyState">
+            <h3>Upload a resume to begin</h3>
+            <p class="mb-0">We will review overall quality, strengths, weak points, missing sections, and practical suggestions from your current AI pipeline.</p>
+        </div>
+
+        <div id="resumeResults" class="resume-results-grid resume-results-grid--styled" hidden>
+            <div class="resume-card resume-card--hero">
+                <div class="resume-score-hero">
+                    <div class="resume-score-hero__ring">
+                        <div class="resume-score-hero__value">
+                            <strong id="resumeScoreValue">0</strong>
+                            <small>/100</small>
+                        </div>
+                    </div>
+                    <div class="resume-score-hero__content">
+                        <div class="resume-card__header">
+                            <div>
+                                <span class="resume-card__eyebrow">Resume Snapshot</span>
+                                <h3 class="mb-1">AI feedback summary</h3>
+                            </div>
+                            <span class="resume-status-chip" id="resumeStatusChip">Ready</span>
+                        </div>
+                        <div class="resume-meter">
+                            <div class="resume-meter__bar" id="resumeScoreBar"></div>
+                        </div>
+                        <p class="mb-0 text-muted" id="resumeSummaryText">Your summary will appear here after analysis.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="resume-card">
+                <div class="resume-card__header">
+                    <div>
+                        <span class="resume-card__eyebrow">Strengths</span>
+                        <h3 class="mb-0">What is already working</h3>
+                    </div>
+                    <span class="resume-card__icon resume-card__icon--success"><i class="bi bi-hand-thumbs-up"></i></span>
+                </div>
+                <ul class="resume-list mb-0" id="resumeStrengthsList"></ul>
+            </div>
+
+            <div class="resume-card">
+                <div class="resume-card__header">
+                    <div>
+                        <span class="resume-card__eyebrow">Areas to Improve</span>
+                        <h3 class="mb-0">What needs attention</h3>
+                    </div>
+                    <span class="resume-card__icon resume-card__icon--warning"><i class="bi bi-lightbulb"></i></span>
+                </div>
+                <ul class="resume-list mb-0" id="resumeWeaknessesList"></ul>
+            </div>
+
+            <div class="resume-card">
+                <div class="resume-card__header">
+                    <div>
+                        <span class="resume-card__eyebrow">Missing Sections</span>
+                        <h3 class="mb-0">Important gaps</h3>
+                    </div>
+                    <span class="resume-card__icon resume-card__icon--danger"><i class="bi bi-exclamation-circle"></i></span>
+                </div>
+                <div class="resume-badge-list" id="resumeMissingSectionsList"></div>
+            </div>
+
+            <div class="resume-card">
+                <div class="resume-card__header">
+                    <div>
+                        <span class="resume-card__eyebrow">Improvement Tips</span>
+                        <h3 class="mb-0">Actionable next steps</h3>
+                    </div>
+                    <span class="resume-card__icon resume-card__icon--violet"><i class="bi bi-magic"></i></span>
+                </div>
+                <ul class="resume-list mb-0" id="resumeTipsList"></ul>
+            </div>
+
+            <div class="resume-card">
+                <div class="resume-card__header">
+                    <div>
+                        <span class="resume-card__eyebrow">Suggested Skills</span>
+                        <h3 class="mb-0">Skills to consider adding</h3>
+                    </div>
+                    <span class="resume-card__icon resume-card__icon--sky"><i class="bi bi-tags"></i></span>
+                </div>
+                <div class="resume-badge-list" id="resumeSuggestedSkillsList"></div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

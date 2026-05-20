@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}{{ login_title }} | CareerLink{% endblock %}
+
+{% block content %}
+<section class="section-pad">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+                <div class="glass-panel p-4 p-lg-5">
+                    <span class="eyebrow-badge">{{ "Secure Admin Portal" if role == "admin" else "Welcome Back" }}</span>
+                    <h1 class="mt-3 mb-2">{{ login_title }}</h1>
+                    <p class="text-muted mb-4">
+                        {% if otp_pending %}
+                            {{ otp_intro or "Enter the 6-digit code sent to" }} {{ pending_email }}. It expires in 5 minutes.
+                        {% else %}
+                            {% if role == "admin" %}
+                                Sign in to continue managing jobs, users, and reports.
+                            {% elif auth_mode == "otp_login" %}
+                                Enter your email to receive a secure sign-in code.
+                            {% elif auth_mode == "forgot_password" %}
+                                Enter your email and we will send an OTP so you can reset your password.
+                            {% else %}
+                                Sign in with the password you created during registration.
+                            {% endif %}
+                        {% endif %}
+                    </p>
+                    <form method="POST" class="row g-3">
+                        {% if otp_pending %}
+                        <div class="col-12">
+                            <label for="otp" class="form-label">Verification Code</label>
+                            <input type="text" class="form-control" id="otp" name="otp" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary w-100 auth-submit-button">Verify OTP</button>
+                        </div>
+                        {% else %}
+                        <div class="col-12">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" autocomplete="email" required>
+                        </div>
+                        {% if role == "admin" or auth_mode == "password" %}
+                        <div class="col-12">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" autocomplete="current-password" required>
+                        </div>
+                        {% endif %}
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary w-100 auth-submit-button">
+                                {% if role == "admin" %}
+                                    {{ login_title }}
+                                {% elif auth_mode == "password" %}
+                                    Login
+                                {% elif auth_mode == "forgot_password" %}
+                                    Send Reset OTP
+                                {% else %}
+                                    Send OTP
+                                {% endif %}
+                            </button>
+                        </div>
+                        {% endif %}
+                    </form>
+                    {% if otp_pending %}
+                    <form method="POST" action="{{ url_for('resend_otp') }}" class="mt-3">
+                        <button type="submit" class="btn btn-outline-primary w-100" id="resendOtpButton" data-cooldown="45">Resend OTP</button>
+                    </form>
+                    {% endif %}
+                    {% if role == "user" %}
+                    <p class="mt-3 mb-0 text-muted">
+                        {% if otp_pending %}
+                            Wrong email? <a href="{{ url_for('user_login') }}">Start again</a>
+                        {% else %}
+                            {% if auth_mode == "password" %}
+                                Need an account? <a href="{{ url_for('register') }}">Create one here</a>
+                            {% elif auth_mode == "otp_login" %}
+                                Prefer your password? <a href="{{ url_for('user_login') }}">Login here</a>
+                            {% else %}
+                                Remembered your password? <a href="{{ url_for('user_login') }}">Back to login</a>
+                            {% endif %}
+                        {% endif %}
+                    </p>
+                    {% if not otp_pending and auth_mode == "password" %}
+                    <div class="auth-alt-links mt-3">
+                        <a href="{{ url_for('otp_login') }}">Another way: Login with OTP</a>
+                        <a href="{{ url_for('forgot_password') }}">Forgot password?</a>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

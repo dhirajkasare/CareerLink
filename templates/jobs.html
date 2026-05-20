@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Job Recommendation | CareerLink{% endblock %}
+
+{% block content %}
+<section class="hero-section hero-section--subpage">
+    <div class="container">
+        <div class="hero-surface hero-surface--jobs">
+            <div class="row g-4 align-items-center">
+                <div class="col-xl-7">
+                    <span class="eyebrow-badge eyebrow-badge--soft">Find the perfect job</span>
+                    <h1 class="hero-title hero-title--sub mt-4">Recommended Jobs For You</h1>
+                    <p class="hero-copy mt-3">
+                        Enter your skills and location to discover the most relevant opportunities already stored in your CareerLink jobs database.
+                    </p>
+
+                    <form method="POST" class="search-strip mt-4">
+                        <div class="search-strip__field">
+                            <input
+                                type="text"
+                                class="form-control search-strip__input"
+                                id="skills"
+                                name="skills"
+                                placeholder="Enter skills"
+                                value="{{ selected_skills }}"
+                                required
+                            >
+                        </div>
+                        <div class="search-strip__field">
+                            <input
+                                type="text"
+                                class="form-control search-strip__input"
+                                id="location"
+                                name="location"
+                                placeholder="Enter location"
+                                value="{{ selected_location }}"
+                                required
+                            >
+                        </div>
+                        <button type="submit" class="btn btn-gradient search-strip__button">Search Jobs</button>
+                    </form>
+                </div>
+
+                <div class="col-xl-5">
+                    <div class="hero-subvisual">
+                        <img src="{{ url_for('static', filename='images/jobs-illustration.svg') }}" alt="Job recommendation illustration" class="page-visual">
+                        <div class="hero-side-stat">
+                            <span class="hero-side-stat__icon"><i class="bi bi-briefcase"></i></span>
+                            <div>
+                                <strong>{{ jobs_overview.total_jobs }}+</strong>
+                                <small>active jobs tracked</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad section-pad--tight">
+    <div class="container">
+        <div class="jobs-layout">
+            <aside class="jobs-sidebar">
+                <div class="info-card jobs-sidebar__card">
+                    <div class="sidebar-card__header">
+                        <h3>Career dataset snapshot</h3>
+                    </div>
+                    <div class="metric-stack">
+                        <div class="metric-stack__item">
+                            <span>Total Jobs</span>
+                            <strong>{{ jobs_overview.total_jobs }}</strong>
+                        </div>
+                        <div class="metric-stack__item">
+                            <span>Companies</span>
+                            <strong>{{ jobs_overview.total_companies }}</strong>
+                        </div>
+                        <div class="metric-stack__item">
+                            <span>Locations</span>
+                            <strong>{{ jobs_overview.total_locations }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card jobs-sidebar__card">
+                    <div class="sidebar-card__header">
+                        <h3>Top Skills In Demand</h3>
+                    </div>
+                    <div class="demand-skill-list">
+                        {% for label in jobs_overview.skills_labels %}
+                        <div class="demand-skill">
+                            <span>{{ label }}</span>
+                            <strong>{{ jobs_overview.skills_values[loop.index0] }}</strong>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </aside>
+
+            <div class="jobs-main">
+                {% if searched %}
+                    {% if jobs %}
+                    <div class="results-toolbar">
+                        <div>
+                            <h2 class="results-toolbar__title">Matched opportunities</h2>
+                            <p class="results-toolbar__copy mb-0">{{ total_results }} jobs matched both your skills and your selected location.</p>
+                        </div>
+                        {% if total_pages > 1 %}
+                        <span class="results-toolbar__meta">Page {{ current_page }} of {{ total_pages }}</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="job-list">
+                        {% for job in jobs %}
+                        <div class="job-list__item">
+                            <article class="job-card job-card--listing">
+                                <div class="job-card__main">
+                                    <div class="job-card__listing-head">
+                                        <div class="job-card__identity">
+                                            <span class="job-card__logo">
+                                                {% if job.platform_logo_url %}
+                                                <img src="{{ job.platform_logo_url }}" alt="{{ job.platform_label }} logo" class="job-card__logo-image" loading="lazy" referrerpolicy="no-referrer">
+                                                {% else %}
+                                                {{ (job.company or "C")[:1] }}
+                                                {% endif %}
+                                            </span>
+                                            <div>
+                                                <h3 class="h4 mb-1">{{ job.title }}</h3>
+                                                <p class="job-company mb-1">{{ job.company }}</p>
+                                                <p class="job-card__meta-text mb-0">{{ job.location }}</p>
+                                            </div>
+                                        </div>
+                                        <span class="job-platform-pill">{{ job.platform_label }}</span>
+                                    </div>
+
+                                    <div class="job-detail-panel">
+                                        <span class="job-detail-panel__label">Required Skills</span>
+                                        <div class="job-skill-list">
+                                            {% for skill in (job.skills or '').split(',') if skill.strip() %}
+                                            <span class="job-skill-chip">{{ skill.strip() }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="job-card__side job-card__side--listing">
+                                    <a href="{{ job.link }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary job-card__cta">View Details</a>
+                                </div>
+                            </article>
+                        </div>
+                        {% else %}
+                        <div class="job-list__item">
+                            <div class="empty-state">
+                                <h3>No matching jobs found</h3>
+                                <p class="mb-0">CareerLink only recommends jobs that match both your skills and your selected location.</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if total_pages > 1 %}
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-4">
+                        <p class="text-muted mb-0">Page {{ current_page }} of {{ total_pages }}</p>
+                        <nav aria-label="Job recommendations pagination">
+                            <ul class="pagination mb-0">
+                                <li class="page-item {{ 'disabled' if current_page <= 1 else '' }}">
+                                    <a class="page-link" href="{{ url_for('jobs', skills=selected_skills, location=selected_location, page=current_page - 1) }}">Previous</a>
+                                </li>
+                                {% for page_number in pagination_pages %}
+                                    {% if page_number %}
+                                    <li class="page-item {{ 'active' if page_number == current_page else '' }}">
+                                        <a class="page-link" href="{{ url_for('jobs', skills=selected_skills, location=selected_location, page=page_number) }}">{{ page_number }}</a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                                    {% endif %}
+                                {% endfor %}
+                                <li class="page-item {{ 'disabled' if current_page >= total_pages else '' }}">
+                                    <a class="page-link" href="{{ url_for('jobs', skills=selected_skills, location=selected_location, page=current_page + 1) }}">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                    {% endif %}
+                {% else %}
+                <div class="empty-state empty-state--hero">
+                    <h3>Start your job search</h3>
+                    <p class="mb-0">Add your skills and location above to see opportunities that suit your profile.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

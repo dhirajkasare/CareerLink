@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Fraud Detection | CareerLink{% endblock %}
+
+{% block content %}
+<section class="hero-section hero-section--subpage">
+    <div class="container">
+        <div class="hero-surface hero-surface--fraud">
+            <div class="row g-4 align-items-center">
+                <div class="col-xl-7">
+                    <span class="eyebrow-badge eyebrow-badge--soft">Fraud check</span>
+                    <h1 class="hero-title hero-title--sub mt-4">Analyze Job Posting Risk</h1>
+                    <p class="hero-copy mt-3">
+                        Paste a job description and let CareerLink review it for scam indicators, trust signals, and a clear recommendation.
+                    </p>
+                </div>
+                <div class="col-xl-5">
+                    <div class="hero-subvisual">
+                        <img src="{{ url_for('static', filename='images/fraud-illustration.svg') }}" alt="Fraud detection illustration" class="page-visual">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad section-pad--tight">
+    <div class="container">
+        <div class="fraud-shell">
+            <div class="fraud-shell__entry">
+                <div class="glass-panel">
+                    <form id="fraudAnalysisForm" class="fraud-form">
+                        <div class="fraud-form__header">
+                            <div>
+                                <span class="fraud-card__eyebrow">Enter Job Description</span>
+                                <h3 class="mt-3 mb-2">Paste the full job posting to inspect it</h3>
+                                <p class="text-muted mb-0">Include salary details, company information, contact details, and application instructions if available.</p>
+                            </div>
+                        </div>
+
+                        <div class="fraud-form__field">
+                            <label for="jobDescription" class="form-label visually-hidden">Job Description</label>
+                            <textarea
+                                class="form-control fraud-form__textarea"
+                                id="jobDescription"
+                                name="job_description"
+                                rows="10"
+                                placeholder="Paste the full job posting here."
+                                required
+                            ></textarea>
+                        </div>
+
+                        <div class="fraud-form__actions">
+                            <button type="submit" class="btn btn-gradient" id="fraudAnalyzeButton">Analyze Job</button>
+                            <div class="fraud-loading" id="fraudLoading" hidden>
+                                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                <span>Running fraud analysis...</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="fraud-shell__results">
+                <div id="fraudAlert" class="alert alert-danger" hidden></div>
+
+                <div class="fraud-empty-state empty-state" id="fraudEmptyState">
+                    <h3>Start with a job post</h3>
+                    <p class="mb-0">Your fraud assessment will appear here with risk indicators, explanation, and a clear recommendation.</p>
+                </div>
+
+                <div id="fraudResults" class="fraud-results-grid fraud-results-grid--styled" hidden>
+                    <div class="fraud-card fraud-card--hero">
+                        <div class="fraud-card__header">
+                            <span class="fraud-card__eyebrow">Classification</span>
+                            <span class="fraud-status-badge" id="classificationBadge">Pending</span>
+                        </div>
+                        <h3 id="classificationTitle">Job Posting Review</h3>
+                        <p class="mb-0 text-muted" id="classificationSubtitle">The risk summary will appear after analysis.</p>
+                    </div>
+
+                    <div class="fraud-card fraud-card--signal">
+                        <div class="fraud-card__header">
+                            <span class="fraud-card__eyebrow">Risk Score</span>
+                            <strong id="riskScoreValue">0%</strong>
+                        </div>
+                        <div class="fraud-meter">
+                            <div class="fraud-meter__bar" id="riskScoreBar"></div>
+                        </div>
+                        <p class="mb-0 text-muted">Higher scores indicate stronger scam signals.</p>
+                    </div>
+
+                    <div class="fraud-card fraud-card--signal">
+                        <div class="fraud-card__header">
+                            <span class="fraud-card__eyebrow">Confidence</span>
+                            <strong id="confidenceValue">0%</strong>
+                        </div>
+                        <div class="fraud-meter fraud-meter--secondary">
+                            <div class="fraud-meter__bar" id="confidenceBar"></div>
+                        </div>
+                        <p class="mb-0 text-muted">Reflects how strongly the analysis supports its conclusion.</p>
+                    </div>
+
+                    <div class="fraud-card fraud-card--wide">
+                        <div class="fraud-card__header">
+                            <span class="fraud-card__eyebrow">Recommendation</span>
+                            <span class="fraud-recommendation" id="recommendationBadge">Caution</span>
+                        </div>
+                        <p class="mb-0" id="recommendationText">Recommended action will appear here.</p>
+                    </div>
+
+                    <div class="fraud-card fraud-card--wide">
+                        <div class="fraud-card__header">
+                            <span class="fraud-card__eyebrow">Scam Indicators</span>
+                        </div>
+                        <ul class="fraud-indicator-list mb-0" id="scamIndicatorsList"></ul>
+                    </div>
+
+                    <div class="fraud-card fraud-card--wide">
+                        <div class="fraud-card__header">
+                            <span class="fraud-card__eyebrow">Explanation</span>
+                        </div>
+                        <p class="mb-0" id="fraudExplanation"></p>
+                    </div>
+
+                    <div class="fraud-card">
+                        <div class="fraud-card__header">
+                            <span class="fraud-card__eyebrow">Company Signals</span>
+                        </div>
+                        <div class="fraud-check-list">
+                            <div class="fraud-check-item" id="companyPresentCheck"></div>
+                            <div class="fraud-check-item" id="companyVerifiableCheck"></div>
+                        </div>
+                    </div>
+
+                    <div class="fraud-card">
+                        <div class="fraud-card__header">
+                            <span class="fraud-card__eyebrow">Contact Signals</span>
+                        </div>
+                        <div class="fraud-check-list">
+                            <div class="fraud-check-item" id="freeEmailCheck"></div>
+                            <div class="fraud-check-item" id="messagingCheck"></div>
+                        </div>
+                    </div>
+
+                    <div class="fraud-card">
+                        <div class="fraud-card__header">
+                            <span class="fraud-card__eyebrow">Salary Signals</span>
+                        </div>
+                        <div class="fraud-check-list">
+                            <div class="fraud-check-item" id="salaryPresentCheck"></div>
+                            <div class="fraud-check-item" id="salaryUnrealisticCheck"></div>
+                        </div>
+                    </div>
+
+                    <div class="fraud-card">
+                        <div class="fraud-card__header">
+                            <span class="fraud-card__eyebrow">Text Quality</span>
+                        </div>
+                        <div class="fraud-check-list">
+                            <div class="fraud-check-item" id="grammarQualityCheck"></div>
+                            <div class="fraud-check-item" id="genericDescriptionCheck"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

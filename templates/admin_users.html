@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users | CareerLink{% endblock %}
+
+{% block content %}
+<section class="section-pad">
+    <div class="container">
+        <div class="section-header mb-4">
+            <span class="eyebrow-badge">Admin Users</span>
+            <h1 class="mt-3">Manage Users</h1>
+            <p class="text-muted mb-0">Review registered users, promote trusted users, and remove accounts when needed.</p>
+        </div>
+
+        <div class="info-card">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 admin-data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Joined</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td><span class="badge text-bg-secondary">{{ user.role }}</span></td>
+                            <td>{{ user.created_at }}</td>
+                            <td>
+                                {% if user.role != "admin" %}
+                                <div class="d-flex flex-wrap gap-2">
+                                    <form method="POST" action="{{ url_for('promote_user', user_id=user.id) }}">
+                                        <button
+                                            type="submit"
+                                            class="btn btn-sm btn-outline-primary"
+                                            data-confirm-title="Promote User"
+                                            data-confirm-message="Promote {{ user.name }} to admin access? This will allow them to manage jobs, users, and reports."
+                                            data-confirm-action="Promote User"
+                                        >
+                                            Promote to Admin
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('delete_user', user_id=user.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete User</button>
+                                    </form>
+                                </div>
+                                {% else %}
+                                <span class="text-muted">Already Admin</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="adminActionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content admin-confirm-modal">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="adminActionModalTitle">Confirm Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0 text-muted" id="adminActionModalMessage"></p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="adminActionModalConfirm">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteActionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content admin-confirm-modal">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-3">This action will permanently remove the selected account and related profile data. Please confirm before continuing.</p>
+                <label for="deleteConfirmInput" class="form-label">Type <strong>DELETE</strong> to continue</label>
+                <input type="text" class="form-control" id="deleteConfirmInput" placeholder="DELETE">
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="deleteActionModalConfirm" disabled>Delete Permanently</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

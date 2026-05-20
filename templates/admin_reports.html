@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Reports | CareerLink{% endblock %}
+
+{% block content %}
+<section class="section-pad">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <div class="section-header mb-0">
+                <span class="eyebrow-badge">Admin Reports</span>
+                <h1 class="mt-3 mb-0">Performance Overview</h1>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-light">Dashboard</a>
+                <a href="{{ url_for('admin_jobs') }}" class="btn btn-primary">Manage Jobs</a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="info-card h-100">
+                    <h3 class="mb-3">Jobs by Platform</h3>
+                    <div class="stack-list">
+                        {% for row in reports.jobs_by_platform %}
+                        <div class="stack-list__item">
+                            <span>{{ row.platform }}</span>
+                            <strong>{{ row.total }}</strong>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="info-card h-100">
+                    <h3 class="mb-3">Top Locations</h3>
+                    <div class="stack-list">
+                        {% for row in reports.top_locations %}
+                        <div class="stack-list__item">
+                            <span>{{ row.location }}</span>
+                            <strong>{{ row.total }}</strong>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="info-card h-100">
+                    <h3 class="mb-3">Recent Users</h3>
+                    <div class="stack-list">
+                        {% for row in reports.latest_users %}
+                        <div class="stack-list__item stack-list__item--grow">
+                            <div>
+                                <span>{{ row.name }}</span>
+                                <small>{{ row.email }}</small>
+                            </div>
+                            <strong>{{ row.role|title }}</strong>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

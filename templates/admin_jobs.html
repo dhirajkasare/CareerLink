@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Jobs | CareerLink{% endblock %}
+
+{% block content %}
+<section class="section-pad">
+    <div class="container">
+        <div class="section-header mb-4">
+            <span class="eyebrow-badge">Admin Jobs</span>
+            <h1 class="mt-3">Manage Job Listings</h1>
+            <p class="text-muted mb-0">Add, edit, and remove job listings directly from the CareerLink admin panel.</p>
+        </div>
+
+        <div class="glass-panel p-4 mb-4">
+            <h3 class="h5 mb-3">Add New Job</h3>
+            <form method="POST" class="row g-3">
+                <input type="hidden" name="action" value="single">
+                <div class="col-md-4">
+                    <label class="form-label" for="title">Job Title</label>
+                    <input class="form-control" id="title" name="title" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="company">Company Name</label>
+                    <input class="form-control" id="company" name="company" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="location">Location</label>
+                    <input class="form-control" id="location" name="location" required>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label" for="skills">Skills</label>
+                    <input class="form-control" id="skills" name="skills" placeholder="Python, Flask, SQL" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="platform">Platform</label>
+                    <input class="form-control" id="platform" name="platform" placeholder="LinkedIn, Apna, Naukri" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="link">Job Link</label>
+                    <input class="form-control" id="link" name="link" required>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Add Job</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="glass-panel p-4 mb-4">
+            <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-3">
+                <div>
+                    <h3 class="h5 mb-2">Upload Multiple Jobs by CSV</h3>
+                    <p class="text-muted mb-0">Use a CSV file with the exact column names below so the import works without errors.</p>
+                </div>
+                <span class="score-pill align-self-start">CSV Bulk Upload</span>
+            </div>
+
+            <div class="row g-4 align-items-stretch admin-csv-upload">
+                <div class="col-lg-6">
+                    <form method="POST" enctype="multipart/form-data" class="row g-3">
+                        <input type="hidden" name="action" value="bulk_upload">
+                        <div class="col-12">
+                            <label class="form-label" for="jobs_csv">Choose CSV File</label>
+                            <input class="form-control" id="jobs_csv" name="jobs_csv" type="file" accept=".csv" required>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Upload CSV Jobs</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="result-box h-100 admin-csv-guide">
+                        <h4 class="h6 mb-3">Required Column Names</h4>
+                        <div class="admin-csv-guide__badges">
+                            {% for column in job_csv_required_columns %}
+                            <span class="badge text-bg-secondary px-3 py-2">{{ column }}</span>
+                            {% endfor %}
+                        </div>
+                        <p class="mb-2"><strong>Use this exact header row:</strong></p>
+                        <code class="admin-csv-guide__code">title,company,location,skills,link,platform</code>
+                        <p class="admin-csv-guide__note text-muted">Skills example: <code>Python, Flask, SQL</code>. Keep one job in each row.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-3">
+                <div>
+                    <h3 class="mb-1">Existing Jobs</h3>
+                    <p class="text-muted mb-0">Select one or more jobs, then delete them together if needed.</p>
+                </div>
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <button type="button" class="btn btn-outline-primary" id="selectAllJobsButton">Select All</button>
+                    <span class="badge text-bg-secondary px-3 py-2" id="selectedJobsCount">0 selected</span>
+                    <span class="badge text-bg-secondary px-3 py-2">{{ total_jobs }} total jobs</span>
+                    <button
+                        type="submit"
+                        class="btn btn-outline-danger"
+                        id="deleteSelectedJobsButton"
+                        form="bulkDeleteJobsForm"
+                        disabled
+                    >
+                        Delete Selected
+                    </button>
+                </div>
+            </div>
+            <form method="POST" action="{{ url_for('delete_selected_jobs') }}" id="bulkDeleteJobsForm">
+                <input type="hidden" name="page" value="{{ current_page }}">
+            </form>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 admin-data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 56px;"></th>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Company</th>
+                            <th>Location</th>
+                            <th>Platform</th>
+                            <th>Skills</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for job in jobs_list %}
+                        <tr>
+                            <td>
+                                <input
+                                    class="form-check-input job-select-checkbox"
+                                    type="checkbox"
+                                    name="selected_job_ids"
+                                    value="{{ job.id }}"
+                                    form="bulkDeleteJobsForm"
+                                    aria-label="Select job {{ job.id }}"
+                                >
+                            </td>
+                            <td>{{ job.id }}</td>
+                            <td>{{ job.title }}</td>
+                            <td>{{ job.company }}</td>
+                            <td>{{ job.location }}</td>
+                            <td>{{ job.platform }}</td>
+                            <td>{{ job.skills }}</td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <a
+                                        href="{{ url_for('edit_job', job_id=job.id) }}"
+                                        class="btn btn-sm btn-outline-primary admin-confirm-trigger"
+                                        data-confirm-title="Open Edit Form"
+                                        data-confirm-message="You are about to edit the job listing for {{ job.title }} at {{ job.company }}. Continue to the edit page?"
+                                        data-confirm-action="Proceed to Edit"
+                                    >
+                                        Edit
+                                    </a>
+                                    <form method="POST" action="{{ url_for('delete_job', job_id=job.id, page=current_page) }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if total_pages > 1 %}
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-4">
+                <p class="text-muted mb-0">Showing page {{ current_page }} of {{ total_pages }} with {{ page_size }} jobs per page.</p>
+                <nav aria-label="Jobs pagination">
+                    <ul class="pagination mb-0">
+                        <li class="page-item {{ 'disabled' if current_page <= 1 else '' }}">
+                            <a class="page-link" href="{{ url_for('admin_jobs', page=current_page - 1) }}">Previous</a>
+                        </li>
+                        {% for page_number in pagination_pages %}
+                            {% if page_number %}
+                            <li class="page-item {{ 'active' if page_number == current_page else '' }}">
+                                <a class="page-link" href="{{ url_for('admin_jobs', page=page_number) }}">{{ page_number }}</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                            {% endif %}
+                        {% endfor %}
+                        <li class="page-item {{ 'disabled' if current_page >= total_pages else '' }}">
+                            <a class="page-link" href="{{ url_for('admin_jobs', page=current_page + 1) }}">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="adminActionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content admin-confirm-modal">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="adminActionModalTitle">Confirm Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0 text-muted" id="adminActionModalMessage"></p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="adminActionModalConfirm">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteActionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content admin-confirm-modal">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-3">This action will permanently remove the selected record. Please confirm before continuing.</p>
+                <label for="deleteConfirmInput" class="form-label">Type <strong>DELETE</strong> to continue</label>
+                <input type="text" class="form-control" id="deleteConfirmInput" placeholder="DELETE">
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="deleteActionModalConfirm" disabled>Delete Permanently</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up | CareerLink{% endblock %}
+
+{% block content %}
+<section class="section-pad">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="glass-panel p-4 p-lg-5">
+                    <span class="eyebrow-badge">Create Your Account</span>
+                    <h1 class="mt-3 mb-2">Sign Up</h1>
+                    <p class="text-muted mb-4">Build your CareerLink account to discover jobs, manage your profile, and access career tools.</p>
+                    <form method="POST" class="row g-3">
+                        <div class="col-md-6">
+                            <label for="first_name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" autocomplete="given-name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="last_name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" autocomplete="family-name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" autocomplete="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" autocomplete="new-password" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="confirm_password" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" autocomplete="new-password" required>
+                        </div>
+                        <div class="col-12">
+                            <div class="auth-note">
+                                We will send a 6-digit OTP to verify this email before creating your account. Your password will be used for your normal login after registration.
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary w-100 auth-submit-button">Send OTP</button>
+                        </div>
+                    </form>
+                    <p class="mt-3 mb-0 text-muted">Already have an account? <a href="{{ url_for('user_login') }}">User Login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

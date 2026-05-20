@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard | CareerLink{% endblock %}
+{% block admin_header_title %}CareerLink Control Center{% endblock %}
+
+{% block content %}
+<section class="section-pad section-pad--admin pt-0">
+    <div class="dashboard-welcome mb-4">
+        <div>
+            <span class="eyebrow-badge eyebrow-badge--soft">Admin module</span>
+            <h2 class="mt-3 mb-2">Welcome back, {{ current_user["name"] }}.</h2>
+            <p class="mb-0">Here is what is happening across jobs, users, resumes, and platform activity.</p>
+        </div>
+        <div class="dashboard-welcome__actions">
+            <a href="{{ url_for('admin_jobs') }}" class="btn btn-gradient">Manage Jobs</a>
+            <a href="{{ url_for('admin_users') }}" class="btn btn-outline-primary">Manage Users</a>
+            <a href="{{ url_for('admin_reports') }}" class="btn btn-outline-primary">Reports</a>
+        </div>
+    </div>
+
+    <div class="stats-grid stats-grid--admin mb-4">
+        <div class="stats-card stats-card--soft">
+            <span class="stats-card__icon stats-card__icon--violet"><i class="bi bi-briefcase"></i></span>
+            <div>
+                <span>Total Jobs</span>
+                <h3>{{ stats.jobs_count }}</h3>
+            </div>
+        </div>
+        <div class="stats-card stats-card--soft">
+            <span class="stats-card__icon stats-card__icon--mint"><i class="bi bi-people"></i></span>
+            <div>
+                <span>Registered Users</span>
+                <h3>{{ stats.users_count }}</h3>
+            </div>
+        </div>
+        <div class="stats-card stats-card--soft">
+            <span class="stats-card__icon stats-card__icon--amber"><i class="bi bi-file-earmark-text"></i></span>
+            <div>
+                <span>Uploaded Resumes</span>
+                <h3>{{ stats.resumes_count }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-dashboard-grid">
+        <div class="chart-card chart-card--span-two">
+            <div class="card-heading">
+                <div>
+                    <h3>Current Market Snapshot</h3>
+                    <p class="mb-0">Demand distribution from the live jobs database.</p>
+                </div>
+            </div>
+            <div class="chart-stage chart-stage--lg">
+                <canvas id="skillsChart"></canvas>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="card-heading">
+                <div>
+                    <h3>Quick Actions</h3>
+                    <p class="mb-0">Jump straight into common admin tasks.</p>
+                </div>
+            </div>
+            <div class="quick-action-grid">
+                <a href="{{ url_for('admin_jobs') }}" class="quick-action-card">
+                    <i class="bi bi-briefcase"></i>
+                    <span>Manage Jobs</span>
+                </a>
+                <a href="{{ url_for('admin_users') }}" class="quick-action-card">
+                    <i class="bi bi-people"></i>
+                    <span>Manage Users</span>
+                </a>
+                <a href="{{ url_for('admin_reports') }}" class="quick-action-card">
+                    <i class="bi bi-bar-chart"></i>
+                    <span>Generate Reports</span>
+                </a>
+                <a href="{{ url_for('profile') }}" class="quick-action-card">
+                    <i class="bi bi-person-circle"></i>
+                    <span>System Settings</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="info-card chart-card--span-two">
+            <div class="card-heading">
+                <div>
+                    <h3>Recent Jobs</h3>
+                    <p class="mb-0">Latest entries added to the jobs table.</p>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Company</th>
+                            <th>Title</th>
+                            <th>Location</th>
+                            <th>Platform</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for job in recent_jobs %}
+                        <tr>
+                            <td>{{ job.id }}</td>
+                            <td>{{ job.company }}</td>
+                            <td>{{ job.title }}</td>
+                            <td>{{ job.location }}</td>
+                            <td>{{ job.platform }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="card-heading">
+                <div>
+                    <h3>Recent Resumes</h3>
+                    <p class="mb-0">Most recent uploads from users.</p>
+                </div>
+            </div>
+            <div class="stack-list">
+                {% for resume in recent_resumes %}
+                <div class="stack-list__item stack-list__item--grow">
+                    <div>
+                        <strong>{{ resume.name }}</strong>
+                        <small>{{ resume.email }}</small>
+                    </div>
+                    <small>{{ resume.filename }}</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="card-heading">
+                <div>
+                    <h3>Top Locations</h3>
+                    <p class="mb-0">Most active hiring destinations.</p>
+                </div>
+            </div>
+            <div class="chart-stage">
+                <canvas id="locationsChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="card-heading">
+                <div>
+                    <h3>Top Companies</h3>
+                    <p class="mb-0">Employers with the most openings.</p>
+                </div>
+            </div>
+            <div class="chart-stage">
+                <canvas id="companiesChart"></canvas>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.dashboardData = {{ dashboard_data | tojson }};
+</script>
+{% endblock %}
